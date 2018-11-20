@@ -10,6 +10,13 @@ import {
  * @param {Cache} cache
  */
 async function addClientToCache(cache) {
+  const aLotOfPromisses = ASSETS.map(async asset => {
+    const url = `${CLIENT_URL}/${asset}`
+
+    await cache.add(url)
+  })
+
+  await Promise.all(aLotOfPromisses)
 }
 
 /**
@@ -17,6 +24,19 @@ async function addClientToCache(cache) {
  * @param {Cache} cache
  */
 async function addIngredientsToCache(cache) {
+  const response = await fetch(INGREDIENTS_URL)
+  
+  cache.put(INGREDIENTS_URL, response.clone())
+
+  const json = await response.json()
+
+  const ingredientPromises = json.map(async ingredient => {
+    const url = `${SERVER_URL}${ingredient.image}`
+
+    await cache.add(url)
+  })
+
+  await Promise.all(ingredientPromises)
 }
 
 /**
@@ -24,6 +44,15 @@ async function addIngredientsToCache(cache) {
  * @param {string} cacheVersion
  */
 function clearOldCaches(cacheVersion) {
+  return caches.keys().then(async cacheIds => {
+    const deletePromises = cacheIds.forEach(async name => {
+      if (name !== cacheVersion) {
+        await caches.delete(name)
+      }
+    })
+
+    await Promise.all(deletePromises)
+  })
 }
 
 export {

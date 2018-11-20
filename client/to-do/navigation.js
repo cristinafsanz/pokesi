@@ -4,6 +4,7 @@
  * @param {string} pathname
  */
 function saveNewHistoryState(pathname) {
+  window.history.pushState(null, 'otro título', pathname)
 }
 
 /**
@@ -12,6 +13,7 @@ function saveNewHistoryState(pathname) {
  * @param {function} callback
  */
 function listenToHistoryEvents(callback) {
+  window.addEventListener('popstate', callback)
 }
 
 export {
